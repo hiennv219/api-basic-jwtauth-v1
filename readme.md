@@ -5,18 +5,15 @@
     "tymon/jwt-auth": "^0.5.9",
 
 
+#app.php
 
-#\app\Http\Kernel.php:
 
-    protected $routeMiddleware = [
-        'auth' => \App\Http\Middleware\Authenticate::class,
-        'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
-        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
-        //JWTAUTH IM HERE
-        'jwt-auth' => \App\Http\Middleware\authJWT::class,
-        'cors' => \App\Http\Middleware\CORS::class,
+    //JWTAUTH IM HERE
+    Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
 
-    ];
+    //JWTAUTH IM HERE
+    'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
+
 
 
 # app\Http\Middleware\authJWT.php:
@@ -76,6 +73,20 @@
 
 
 
+
+#\app\Http\Kernel.php:
+
+    protected $routeMiddleware = [
+        'auth' => \App\Http\Middleware\Authenticate::class,
+        'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        //JWTAUTH IM HERE
+        'jwt-auth' => \App\Http\Middleware\authJWT::class,
+        'cors' => \App\Http\Middleware\CORS::class,
+
+    ];
+
+
 #\app\Http\routes.php:
 
 
@@ -84,17 +95,6 @@
 		Route::post('get_user_details', 'APIController@get_user_details');
 
 	});
-
-
-
-#app.php
-
-
-    //JWTAUTH IM HERE
-    Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
-
-    //JWTAUTH IM HERE
-    'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
 
 
 #APIController
@@ -134,4 +134,10 @@
 
 
 
+#URL API POST
 
+	http://localhost:8000/api/register
+
+	http://localhost:8000/api/login
+
+	http://localhost:8000/api/get_user_details
