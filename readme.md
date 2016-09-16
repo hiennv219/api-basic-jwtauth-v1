@@ -1,12 +1,25 @@
-## Laravel PHP Framework
+## Build API basic with JWTAuth v1.0
 
 
-#composer.json
+#BEGIN
+
+Step 1:
+
+	Create database
+	
+Step 2: Run composer to build db
+
+	php artisan migrate	
+
+
+#SOURCECODE
+
+## composer.json
 
     "tymon/jwt-auth": "^0.5.9",
 
 
-#app.php
+## config/app.php
 
 
     //JWTAUTH IM HERE
@@ -15,7 +28,7 @@
     //JWTAUTH IM HERE
     'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
 
-# Except Token in API
+## Except Token in API
 
 Laravel 5.1:
 
@@ -35,7 +48,7 @@ IF Laravel 5.2:
 	}
 
 
-# app\Http\Middleware\authJWT.php:
+## app\Http\Middleware\authJWT.php:
 
 
 	use Closure;
@@ -68,7 +81,7 @@ IF Laravel 5.2:
         return $next($request);
     }
 
-#app\Http\Middleware\CORS.php
+## app\Http\Middleware\CORS.php
 
     public function handle($request, Closure $next)
     {
@@ -93,7 +106,7 @@ IF Laravel 5.2:
 
 
 
-#app\Http\Kernel.php:
+## app\Http\Kernel.php:
 
     protected $routeMiddleware = [
         'auth' => \App\Http\Middleware\Authenticate::class,
@@ -106,7 +119,7 @@ IF Laravel 5.2:
     ];
 
 
-#app\Http\routes.php:
+## app\Http\routes.php:
 
 
 	Route::group(['middleware' => ['cors'], 'prefix' => 'api'], function(){
@@ -124,7 +137,7 @@ IF Laravel 5.2:
 	});
 
 
-#APIController
+## APIController
 
 
     public function register(Request $request){
@@ -160,11 +173,18 @@ IF Laravel 5.2:
     }
 
 
+#IMPLEMENT
 
-#URL API POST
+## URL API POST
+
+Step 1:
 
 	http://localhost:8000/api/register
 
+Step 2: Login account -> fetch Token
+
 	http://localhost:8000/api/login
+
+Step 3: 	
 
 	http://localhost:8000/api/get_user_details
