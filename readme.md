@@ -1,5 +1,6 @@
 ## Laravel PHP Framework
 
+
 #composer.json
 
     "tymon/jwt-auth": "^0.5.9",
@@ -14,6 +15,24 @@
     //JWTAUTH IM HERE
     'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
 
+# Except Token in API
+
+Laravel 5.1:
+
+	protected $except = [
+	    'api/*'
+	];
+
+IF Laravel 5.2:
+
+    public function handle($request, Closure $next)
+	{
+    	if ( ! $request->is('api/*'))
+    	{
+    	   return parent::handle($request, $next);
+    	}
+    	return $next($request);
+	}
 
 
 # app\Http\Middleware\authJWT.php:
@@ -90,10 +109,18 @@
 #\app\Http\routes.php:
 
 
-	Route::group(['middleware' => 'jwt-auth'], function(){
+	Route::group(['middleware' => ['cors'], 'prefix' => 'api'], function(){
 
-		Route::post('get_user_details', 'APIController@get_user_details');
+		Route::post('register', 'APIController@register');
 
+		Route::post('login', 'APIcontroller@login');
+
+		//JWTAUTH IM HERE
+		Route::group(['middleware' => 'jwt-auth'], function(){
+
+			Route::post('get_user_details', 'APIController@get_user_details');
+
+		});
 	});
 
 
