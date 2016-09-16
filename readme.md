@@ -1,27 +1,137 @@
 ## Laravel PHP Framework
 
-[![Build Status](https://travis-ci.org/laravel/framework.svg)](https://travis-ci.org/laravel/framework)
-[![Total Downloads](https://poser.pugx.org/laravel/framework/d/total.svg)](https://packagist.org/packages/laravel/framework)
-[![Latest Stable Version](https://poser.pugx.org/laravel/framework/v/stable.svg)](https://packagist.org/packages/laravel/framework)
-[![Latest Unstable Version](https://poser.pugx.org/laravel/framework/v/unstable.svg)](https://packagist.org/packages/laravel/framework)
-[![License](https://poser.pugx.org/laravel/framework/license.svg)](https://packagist.org/packages/laravel/framework)
+#composer.json
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as authentication, routing, sessions, queueing, and caching.
+    "tymon/jwt-auth": "^0.5.9",
 
-Laravel is accessible, yet powerful, providing powerful tools needed for large, robust applications. A superb inversion of control container, expressive migration system, and tightly integrated unit testing support give you the tools you need to build any application with which you are tasked.
 
-## Official Documentation
 
-Documentation for the framework can be found on the [Laravel website](http://laravel.com/docs).
+#\app\Http\Kernel.php:
 
-## Contributing
+    protected $routeMiddleware = [
+        'auth' => \App\Http\Middleware\Authenticate::class,
+        'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        //JWTAUTH IM HERE
+        'jwt-auth' => \App\Http\Middleware\authJWT::class,
+        'cors' => \App\Http\Middleware\CORS::class,
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](http://laravel.com/docs/contributions).
+    ];
 
-## Security Vulnerabilities
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+# app\Http\Middleware\authJWT.php:
 
-### License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
+	use Closure;
+	use JWTAuth;
+	use Exception;
+
+    public function handle($request, Closure $next)
+    {
+        try {
+            
+            $user = JWTAuth::toUser($request->input('token'));
+        
+        } catch (Exception $e) {
+                
+            if($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException){
+
+                return response()->json(['error' => 'Token is Invalid']);
+
+            }else if($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException){
+
+                return response()->json(['error' => 'Token is Expired']);
+
+            }else{
+
+                return response()->json(['error' => 'Something is wrong, ask to Simon!']);
+
+            }
+        }
+
+        return $next($request);
+    }
+
+#app\Http\Middleware\CORS.php
+
+    public function handle($request, Closure $next)
+    {
+
+        header('Access-Control-Allow-Origin: *');
+        
+        $headers = [
+            'Access-Control-Allow-Methods'=> 'POST, GET, OPTIONS, PUT, DELETE',
+            'Access-Control-Allow-Headers'=> 'Content-Type, X-Auth-Token, Origin'
+        ];
+        if($request->getMethod() == "OPTIONS") {
+            return Response::make('OK', 200, $headers);
+        }
+        
+        $response = $next($request);
+        foreach($headers as $key => $value)
+            $response->header($key, $value);
+        return $response;
+
+    }
+
+
+
+#\app\Http\routes.php:
+
+
+	Route::group(['middleware' => 'jwt-auth'], function(){
+
+		Route::post('get_user_details', 'APIController@get_user_details');
+
+	});
+
+
+
+#app.php
+
+
+    //JWTAUTH IM HERE
+    Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
+
+    //JWTAUTH IM HERE
+    'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
+
+
+#APIController
+
+
+    public function register(Request $request){
+
+        $input = $request->all();
+        $input['password'] = Hash::make($input['password']);
+        User::create($input);
+        return response()->json(['result' => true]);
+    }
+
+    public function login(Request $request){
+
+        $input = $request->all();
+
+        if(!$token = JWTAuth::attempt($input)){
+
+            return response()->json(['result' => 'worng email or password']);
+        
+        }
+
+        return response()->json(['result' => $token]);
+    }
+
+
+    public function get_user_details(Request $request){
+
+        $input = $request->all();
+
+        $user = JWTAuth::toUser($input['token']);
+
+        return response()->json(['result' => $user]);
+
+    }
+
+
+
+

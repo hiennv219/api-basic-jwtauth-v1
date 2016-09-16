@@ -145,6 +145,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        //JWTAUTH IM HERE
         Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
 
     ],
