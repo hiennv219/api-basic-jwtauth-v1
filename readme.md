@@ -1,4 +1,8 @@
-## Build API basic with JWTAuth v1.0
+# Build API basic with JWTAuth v1.0
+	
+	By Simon Nguyen
+	Profile: http://hiennv219.github.io
+	Skype: nvhien129@hotmail.com
 
 
 #BEGIN
