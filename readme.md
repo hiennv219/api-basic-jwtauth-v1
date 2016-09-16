@@ -93,7 +93,7 @@ IF Laravel 5.2:
 
 
 
-#\app\Http\Kernel.php:
+#app\Http\Kernel.php:
 
     protected $routeMiddleware = [
         'auth' => \App\Http\Middleware\Authenticate::class,
@@ -106,7 +106,7 @@ IF Laravel 5.2:
     ];
 
 
-#\app\Http\routes.php:
+#app\Http\routes.php:
 
 
 	Route::group(['middleware' => ['cors'], 'prefix' => 'api'], function(){
